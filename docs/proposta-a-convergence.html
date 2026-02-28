@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sunny Systems — Proposta A: Convergence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== TOKENS ===== */
+  :root {
+    /* Foundation */
+    --bg-base: #0B0E0F;
+    --bg-card: #161819;
+    --bg-elevated: #1C1F20;
+
+    /* Accent */
+    --accent: #FFDE59;
+    --accent-hover: #FFE880;
+    --accent-muted: #FFDE5933;
+    --accent-glow: #FFDE5940;
+
+    /* Text via opacity */
+    --text-primary: rgba(255, 255, 255, 0.87);
+    --text-secondary: rgba(255, 255, 255, 0.54);
+    --text-tertiary: rgba(255, 255, 255, 0.38);
+    --text-ghost: rgba(255, 255, 255, 0.20);
+
+    /* Borders & Glass */
+    --border-subtle: rgba(255, 255, 255, 0.10);
+    --border-hover: rgba(255, 255, 255, 0.20);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-bg-hover: rgba(255, 255, 255, 0.08);
+
+    /* Typo */
+    --font-display: 'Quicksand', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Spacing */
+    --section-pad: clamp(3rem, 8vw, 6rem);
+    --container: min(72rem, 90vw);
+
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+  }
+
+  /* ===== RESET ===== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  img, svg { display: block; max-width: 100%; }
+  a { color: var(--accent); text-decoration: none; }
+
+  /* ===== UTILITIES ===== */
+  .container { width: var(--container); margin: 0 auto; }
+  .section { padding: var(--section-pad) 0; }
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+  }
+  .section-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    max-width: 40rem;
+    line-height: 1.7;
+  }
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 0;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 1rem 0;
+    background: rgba(11, 14, 15, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .nav-logo svg { width: 28px; height: 28px; }
+  .nav-wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+  .nav-wordmark span {
+    font-weight: 400;
+    color: var(--text-secondary);
+  }
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: var(--accent-muted);
+    color: var(--accent);
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+  }
+
+  /* ===== 1. COVER ===== */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding-top: 4rem;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-content { position: relative; z-index: 1; }
+  .cover-symbol {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2.5rem;
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { filter: drop-shadow(0 0 20px var(--accent-glow)); }
+    50% { filter: drop-shadow(0 0 40px var(--accent-glow)) drop-shadow(0 0 80px rgba(255, 222, 89, 0.15)); }
+  }
+  .cover h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 0.5rem;
+  }
+  .cover h1 .systems {
+    font-weight: 400;
+    color: var(--text-secondary);
+    font-size: 0.5em;
+    display: block;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+  }
+  .cover-tagline {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-top: 1.5rem;
+    font-weight: 300;
+  }
+  .cover-proposal {
+    display: inline-block;
+    margin-top: 2.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 0.6rem 1.5rem;
+    border: 1px solid var(--accent-muted);
+    border-radius: 999px;
+  }
+  .cover-scroll {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--text-ghost);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: bob 2s ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ===== 2. LOGO SYSTEM ===== */
+  .logo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .logo-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .logo-card:hover {
+    border-color: var(--border-hover);
+    background: var(--glass-bg-hover);
+  }
+  .logo-card.light {
+    background: #F5F5F5;
+    border-color: transparent;
+  }
+  .logo-card-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    text-align: center;
+    margin-top: 0.75rem;
+  }
+  .logo-card.light .logo-card-label { color: rgba(0,0,0,0.4); }
+  .logo-wrapper { text-align: center; }
+
+  /* ===== 3. CONVERGENCE ===== */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .pillar-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .pillar-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-muted);
+  }
+  .pillar-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--accent-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    color: var(--accent);
+  }
+  .pillar-card h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+  }
+  .pillar-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ===== 4. PALETTE ===== */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+  .color-chip {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+  }
+  .color-chip-swatch {
+    height: 100px;
+    width: 100%;
+  }
+  .color-chip-info {
+    padding: 0.75rem 1rem;
+    background: var(--bg-card);
+  }
+  .color-chip-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+  .color-chip-value {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-body);
+  }
+
+  /* ===== 5. TYPOGRAPHY ===== */
+  .type-scale {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .type-row {
+    display: flex;
+    align-items: baseline;
+    gap: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .type-meta {
+    flex-shrink: 0;
+    width: 120px;
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .type-sample {
+    font-family: var(--font-display);
+    line-height: 1.2;
+  }
+  .type-sample.body-font { font-family: var(--font-body); }
+
+  @media (max-width: 600px) {
+    .type-row { flex-direction: column; gap: 0.5rem; }
+    .type-meta { width: auto; }
+  }
+
+  /* ===== 6. OPACITY & GLASS ===== */
+  .opacity-demo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .opacity-swatch {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+  }
+  .opacity-swatch .big-text {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .opacity-swatch .label {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    letter-spacing: 0.05em;
+  }
+
+  .glass-demo {
+    margin-top: 3rem;
+    position: relative;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    min-height: 300px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+  .glass-card-demo {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    max-width: 360px;
+    width: 100%;
+  }
+  .glass-card-demo h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .glass-card-demo p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .glass-card-demo .badge-demo {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    background: var(--accent-muted);
+    color: var(--accent);
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+  }
+
+  /* ===== 7. COMPONENTS ===== */
+  .components-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .comp-group h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    color: var(--text-secondary);
+  }
+  .comp-group .items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.5rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0B0E0F;
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-hover);
+  }
+  .btn-secondary:hover {
+    background: var(--glass-bg);
+    border-color: var(--text-tertiary);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--accent);
+    padding: 0.65rem 1rem;
+  }
+  .btn-ghost:hover { background: var(--accent-muted); }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 999px;
+    letter-spacing: 0.03em;
+  }
+  .badge-accent {
+    background: var(--accent-muted);
+    color: var(--accent);
+  }
+  .badge-neutral {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-secondary);
+  }
+  .badge-dot::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* Card component */
+  .comp-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .comp-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+  .comp-card h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+  }
+  .comp-card p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* ===== 8. HERO MOCKUP ===== */
+  .mockup-hero {
+    margin-top: 3rem;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+  }
+  .mockup-browser-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .mockup-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+  }
+  .mockup-url {
+    flex: 1;
+    margin-left: 0.5rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+  }
+  .mockup-content {
+    padding: clamp(2rem, 5vw, 5rem);
+    text-align: center;
+    position: relative;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .mockup-content::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .mockup-content .hero-pre {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-muted);
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    margin-bottom: 1.5rem;
+  }
+  .mockup-content h2 {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .mockup-content .hero-desc {
+    position: relative;
+    z-index: 1;
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 32rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+  .mockup-content .hero-actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* ===== 9. DASHBOARD MOCKUP ===== */
+  .mockup-dashboard {
+    margin-top: 2rem;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+  }
+  .dash-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 400px;
+  }
+  @media (max-width: 768px) {
+    .dash-layout { grid-template-columns: 1fr; }
+    .dash-sidebar { display: none; }
+  }
+  .dash-sidebar {
+    border-right: 1px solid var(--border-subtle);
+    padding: 1.5rem;
+  }
+  .dash-sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  .dash-sidebar-logo svg { width: 22px; height: 22px; }
+  .dash-sidebar-logo span {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .dash-nav {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .dash-nav li {
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .dash-nav li:hover { background: var(--glass-bg); color: var(--text-primary); }
+  .dash-nav li.active {
+    background: var(--accent-muted);
+    color: var(--accent);
+  }
+  .dash-main {
+    padding: 2rem;
+  }
+  .dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .dash-header h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+  .dash-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+  .stat-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+  }
+  .stat-card .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .stat-card .stat-value {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+  .stat-card .stat-change {
+    font-size: 0.75rem;
+    color: #4ade80;
+    margin-top: 0.25rem;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--text-ghost);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="container">
+    <div class="nav-logo">
+      <!-- Pinwheel symbol mini -->
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="4" fill="#FFDE59"/>
+        <g stroke="#FFDE59" stroke-width="2.5" stroke-linecap="round">
+          <line x1="20" y1="3" x2="20" y2="13"/>
+          <line x1="34.7" y1="11.5" x2="26.1" y2="17"/>
+          <line x1="34.7" y1="28.5" x2="26.1" y2="23"/>
+          <line x1="20" y1="37" x2="20" y2="27"/>
+          <line x1="5.3" y1="28.5" x2="13.9" y2="23"/>
+          <line x1="5.3" y1="11.5" x2="13.9" y2="17"/>
+        </g>
+      </svg>
+      <span class="nav-wordmark">sunny <span>systems</span></span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#logo">Logo</a></li>
+      <li><a href="#concept">Conceito</a></li>
+      <li><a href="#palette">Cores</a></li>
+      <li><a href="#typography">Tipo</a></li>
+      <li><a href="#glass">Glass</a></li>
+      <li><a href="#components">UI</a></li>
+      <li><a href="#mockups">Mockups</a></li>
+    </ul>
+    <span class="nav-badge">Proposta A</span>
+  </div>
+</nav>
+
+<!-- ===== 1. COVER ===== -->
+<section class="cover" id="cover">
+  <div class="cover-content">
+    <div class="cover-symbol">
+      <!-- Pinwheel / 6-ray asterisk -->
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="60" r="10" fill="#FFDE59"/>
+        <g stroke="#FFDE59" stroke-width="4" stroke-linecap="round">
+          <line x1="60" y1="8" x2="60" y2="40"/>
+          <line x1="105" y1="34" x2="77.3" y2="50"/>
+          <line x1="105" y1="86" x2="77.3" y2="70"/>
+          <line x1="60" y1="112" x2="60" y2="80"/>
+          <line x1="15" y1="86" x2="42.7" y2="70"/>
+          <line x1="15" y1="34" x2="42.7" y2="50"/>
+        </g>
+      </svg>
+    </div>
+    <h1>sunny<span class="systems">Systems</span></h1>
+    <p class="cover-tagline">Convergence Brand Identity 2026</p>
+    <span class="cover-proposal">Proposta A &mdash; Convergence</span>
+  </div>
+  <span class="cover-scroll">&darr; Scroll</span>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 2. LOGO SYSTEM ===== -->
+<section class="section" id="logo">
+  <div class="container">
+    <span class="section-label">02 &mdash; Logo System</span>
+    <h2 class="section-title">Sistema de Logo</h2>
+    <p class="section-subtitle">Simbolo pinwheel de 6 raios com ponto central dourado, wordmark arredondado e lockup unificado. Projetado para funcionar em qualquer escala e contexto.</p>
+
+    <div class="logo-grid">
+      <!-- Symbol dark -->
+      <div>
+        <div class="logo-card">
+          <svg viewBox="0 0 120 120" fill="none" width="80" height="80">
+            <circle cx="60" cy="60" r="10" fill="#FFDE59"/>
+            <g stroke="#FFDE59" stroke-width="4" stroke-linecap="round">
+              <line x1="60" y1="8" x2="60" y2="40"/>
+              <line x1="105" y1="34" x2="77.3" y2="50"/>
+              <line x1="105" y1="86" x2="77.3" y2="70"/>
+              <line x1="60" y1="112" x2="60" y2="80"/>
+              <line x1="15" y1="86" x2="42.7" y2="70"/>
+              <line x1="15" y1="34" x2="42.7" y2="50"/>
+            </g>
+          </svg>
+        </div>
+        <p class="logo-card-label">Simbolo &mdash; Dark</p>
+      </div>
+
+      <!-- Wordmark dark -->
+      <div>
+        <div class="logo-card">
+          <div style="text-align:center">
+            <span style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:var(--text-primary);letter-spacing:-0.02em;">sunny</span>
+            <span style="font-family:var(--font-display);font-size:1rem;font-weight:400;color:var(--text-secondary);letter-spacing:0.25em;text-transform:uppercase;display:block;margin-top:0.15rem;">systems</span>
+          </div>
+        </div>
+        <p class="logo-card-label">Wordmark &mdash; Dark</p>
+      </div>
+
+      <!-- Lockup dark -->
+      <div>
+        <div class="logo-card">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <svg viewBox="0 0 120 120" fill="none" width="48" height="48">
+              <circle cx="60" cy="60" r="10" fill="#FFDE59"/>
+              <g stroke="#FFDE59" stroke-width="4" stroke-linecap="round">
+                <line x1="60" y1="8" x2="60" y2="40"/>
+                <line x1="105" y1="34" x2="77.3" y2="50"/>
+                <line x1="105" y1="86" x2="77.3" y2="70"/>
+                <line x1="60" y1="112" x2="60" y2="80"/>
+                <line x1="15" y1="86" x2="42.7" y2="70"/>
+                <line x1="15" y1="34" x2="42.7" y2="50"/>
+              </g>
+            </svg>
+            <div>
+              <span style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;color:var(--text-primary);letter-spacing:-0.02em;">sunny</span>
+              <span style="font-family:var(--font-display);font-size:0.7rem;font-weight:400;color:var(--text-secondary);letter-spacing:0.25em;text-transform:uppercase;display:block;margin-top:0.1rem;">systems</span>
+            </div>
+          </div>
+        </div>
+        <p class="logo-card-label">Lockup &mdash; Dark</p>
+      </div>
+
+      <!-- Symbol light -->
+      <div>
+        <div class="logo-card light">
+          <svg viewBox="0 0 120 120" fill="none" width="80" height="80">
+            <circle cx="60" cy="60" r="10" fill="#C8A020"/>
+            <g stroke="#1A1A1A" stroke-width="4" stroke-linecap="round">
+              <line x1="60" y1="8" x2="60" y2="40"/>
+              <line x1="105" y1="34" x2="77.3" y2="50"/>
+              <line x1="105" y1="86" x2="77.3" y2="70"/>
+              <line x1="60" y1="112" x2="60" y2="80"/>
+              <line x1="15" y1="86" x2="42.7" y2="70"/>
+              <line x1="15" y1="34" x2="42.7" y2="50"/>
+            </g>
+          </svg>
+        </div>
+        <p class="logo-card-label">Simbolo &mdash; Light</p>
+      </div>
+
+      <!-- Wordmark light -->
+      <div>
+        <div class="logo-card light">
+          <div style="text-align:center">
+            <span style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:#1A1A1A;letter-spacing:-0.02em;">sunny</span>
+            <span style="font-family:var(--font-display);font-size:1rem;font-weight:400;color:rgba(0,0,0,0.45);letter-spacing:0.25em;text-transform:uppercase;display:block;margin-top:0.15rem;">systems</span>
+          </div>
+        </div>
+        <p class="logo-card-label">Wordmark &mdash; Light</p>
+      </div>
+
+      <!-- Lockup light -->
+      <div>
+        <div class="logo-card light">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <svg viewBox="0 0 120 120" fill="none" width="48" height="48">
+              <circle cx="60" cy="60" r="10" fill="#C8A020"/>
+              <g stroke="#1A1A1A" stroke-width="4" stroke-linecap="round">
+                <line x1="60" y1="8" x2="60" y2="40"/>
+                <line x1="105" y1="34" x2="77.3" y2="50"/>
+                <line x1="105" y1="86" x2="77.3" y2="70"/>
+                <line x1="60" y1="112" x2="60" y2="80"/>
+                <line x1="15" y1="86" x2="42.7" y2="70"/>
+                <line x1="15" y1="34" x2="42.7" y2="50"/>
+              </g>
+            </svg>
+            <div>
+              <span style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;color:#1A1A1A;letter-spacing:-0.02em;">sunny</span>
+              <span style="font-family:var(--font-display);font-size:0.7rem;font-weight:400;color:rgba(0,0,0,0.45);letter-spacing:0.25em;text-transform:uppercase;display:block;margin-top:0.1rem;">systems</span>
+            </div>
+          </div>
+        </div>
+        <p class="logo-card-label">Lockup &mdash; Light</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 3. CONVERGENCE CONCEPT ===== -->
+<section class="section" id="concept">
+  <div class="container">
+    <span class="section-label">03 &mdash; Conceito</span>
+    <h2 class="section-title">Convergence</h2>
+    <p class="section-subtitle">Quatro pilares fundamentais convergem para o centro &mdash; representando como tecnologia, design, estrategia e pessoas se unem para criar solucoes que transformam negocios.</p>
+
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h3>Technology</h3>
+        <p>Engenharia de software moderna, arquitetura cloud-native e automacao inteligente como fundacao de tudo que construimos.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </div>
+        <h3>Design</h3>
+        <p>Interfaces que combinam estetica premium com usabilidade impecavel. Cada pixel com proposito, cada interacao com significado.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>
+          </svg>
+        </div>
+        <h3>Strategy</h3>
+        <p>Pensamento estrategico que transforma complexidade em clareza. Decisoes orientadas por dados, resultados mensuráveis.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3>People</h3>
+        <p>Equipes multidisciplinares que colaboram sem fronteiras. Talentos globais conectados por uma visao compartilhada.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 4. PALETTE ===== -->
+<section class="section" id="palette">
+  <div class="container">
+    <span class="section-label">04 &mdash; Paleta de Cores</span>
+    <h2 class="section-title">Color Tokens</h2>
+    <p class="section-subtitle">Sistema de cores construido sobre fundacao dark com amarelo dourado como unica cor accent. Tokens semanticos para uso consistente em todos os touchpoints.</p>
+
+    <div class="palette-grid">
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#0B0E0F"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Base</div><div class="color-chip-value">#0B0E0F</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#161819"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Card</div><div class="color-chip-value">#161819</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#1C1F20"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Elevated</div><div class="color-chip-value">#1C1F20</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#FFDE59"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Accent</div><div class="color-chip-value">#FFDE59</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#FFE880"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Accent Hover</div><div class="color-chip-value">#FFE880</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:rgba(255,222,89,0.2);border:1px solid rgba(255,222,89,0.3)"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Accent Muted</div><div class="color-chip-value">accent / 20%</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:rgba(255,255,255,0.87)"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Text Primary</div><div class="color-chip-value">white / 87%</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:rgba(255,255,255,0.54)"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Text Secondary</div><div class="color-chip-value">white / 54%</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.15)"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Border Subtle</div><div class="color-chip-value">white / 10%</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 5. TYPOGRAPHY ===== -->
+<section class="section" id="typography">
+  <div class="container">
+    <span class="section-label">05 &mdash; Tipografia</span>
+    <h2 class="section-title">Type Scale</h2>
+    <p class="section-subtitle">Quicksand para headlines e display &mdash; arredondada, amigavel, com personalidade. Inter para corpo e UI &mdash; neutra, legivel, profissional.</p>
+
+    <div class="type-scale">
+      <div class="type-row">
+        <div class="type-meta">Display<br>Quicksand 700<br>4rem / 64px</div>
+        <div class="type-sample" style="font-size:4rem;font-weight:700;">Build the future</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">H1<br>Quicksand 700<br>3rem / 48px</div>
+        <div class="type-sample" style="font-size:3rem;font-weight:700;">Build the future</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">H2<br>Quicksand 700<br>2rem / 32px</div>
+        <div class="type-sample" style="font-size:2rem;font-weight:700;">Build the future</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">H3<br>Quicksand 600<br>1.5rem / 24px</div>
+        <div class="type-sample" style="font-size:1.5rem;font-weight:600;">Build the future</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">Body<br>Inter 400<br>1rem / 16px</div>
+        <div class="type-sample body-font" style="font-size:1rem;font-weight:400;">We craft enterprise software that scales with your ambition. Modern architecture, beautiful interfaces, measurable outcomes.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">Small<br>Inter 400<br>0.875rem / 14px</div>
+        <div class="type-sample body-font" style="font-size:0.875rem;font-weight:400;color:var(--text-secondary);">Secondary text for descriptions, captions, and supporting information.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">Caption<br>Inter 500<br>0.75rem / 12px</div>
+        <div class="type-sample body-font" style="font-size:0.75rem;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-tertiary);">Label &middot; Caption &middot; Overline</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 6. OPACITY & GLASS ===== -->
+<section class="section" id="glass">
+  <div class="container">
+    <span class="section-label">06 &mdash; Opacidade &amp; Glass</span>
+    <h2 class="section-title">Opacity System</h2>
+    <p class="section-subtitle">Hierarquia visual construida com niveis de opacidade de branco sobre dark. Glass-morphism para profundidade e atmosfera.</p>
+
+    <div class="opacity-demo">
+      <div class="opacity-swatch">
+        <div class="big-text" style="color:rgba(255,255,255,0.87);">Aa</div>
+        <div class="label">white / 87% &mdash; Primary</div>
+      </div>
+      <div class="opacity-swatch">
+        <div class="big-text" style="color:rgba(255,255,255,0.54);">Aa</div>
+        <div class="label">white / 54% &mdash; Secondary</div>
+      </div>
+      <div class="opacity-swatch">
+        <div class="big-text" style="color:rgba(255,255,255,0.38);">Aa</div>
+        <div class="label">white / 38% &mdash; Tertiary</div>
+      </div>
+      <div class="opacity-swatch">
+        <div class="big-text" style="color:rgba(255,255,255,0.20);">Aa</div>
+        <div class="label">white / 20% &mdash; Ghost</div>
+      </div>
+    </div>
+
+    <div class="glass-demo">
+      <!-- Decorative circles -->
+      <div style="position:absolute;top:20%;left:20%;width:200px;height:200px;border-radius:50%;background:rgba(255,222,89,0.15);filter:blur(60px);"></div>
+      <div style="position:absolute;bottom:10%;right:25%;width:150px;height:150px;border-radius:50%;background:rgba(100,140,255,0.1);filter:blur(50px);"></div>
+      <div class="glass-card-demo">
+        <h3>Glass Card</h3>
+        <p>Backdrop blur com bordas semitransparentes cria profundidade sem perder a fundacao dark.</p>
+        <span class="badge-demo">bg-white/5 + blur(24px)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 7. COMPONENTS ===== -->
+<section class="section" id="components">
+  <div class="container">
+    <span class="section-label">07 &mdash; Componentes</span>
+    <h2 class="section-title">UI Components</h2>
+    <p class="section-subtitle">Biblioteca de componentes core construida sobre os tokens do design system. Cada componente respeita hierarquia, opacidade e glass-morphism.</p>
+
+    <div class="components-grid">
+      <!-- Buttons -->
+      <div class="comp-group">
+        <h3>Buttons</h3>
+        <div class="items">
+          <button class="btn btn-primary">Get Started</button>
+          <button class="btn btn-secondary">Learn More</button>
+          <button class="btn btn-ghost">View Docs &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div class="comp-group">
+        <h3>Badges</h3>
+        <div class="items">
+          <span class="badge badge-accent">New Feature</span>
+          <span class="badge badge-neutral badge-dot">Active</span>
+          <span class="badge badge-neutral">v4.0</span>
+          <span class="badge badge-accent badge-dot">Enterprise</span>
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div class="comp-group">
+        <h3>Cards</h3>
+        <div class="items" style="flex-direction:column;width:100%;">
+          <div class="comp-card">
+            <h4>Cloud Infrastructure</h4>
+            <p>Deploy and scale applications with enterprise-grade reliability and performance monitoring built-in.</p>
+          </div>
+          <div class="comp-card">
+            <h4>AI Integration</h4>
+            <p>Intelligent automation powered by machine learning models tailored to your business workflows.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="comp-group">
+        <h3>Input</h3>
+        <div class="items" style="flex-direction:column;width:100%;gap:1rem;">
+          <div>
+            <label style="display:block;font-size:0.75rem;font-weight:500;color:var(--text-secondary);margin-bottom:0.4rem;">Email address</label>
+            <input type="text" placeholder="you@company.com" style="width:100%;padding:0.65rem 1rem;background:var(--glass-bg);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-body);font-size:0.9rem;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(255,222,89,0.4)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 8. HERO MOCKUP ===== -->
+<section class="section" id="mockups">
+  <div class="container">
+    <span class="section-label">08 &mdash; Aplicacao</span>
+    <h2 class="section-title">Hero Section</h2>
+    <p class="section-subtitle">Mockup de hero section de site institucional aplicando o design system Convergence.</p>
+
+    <div class="mockup-hero">
+      <div class="mockup-browser-bar">
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-url">sunnysystems.com.br</div>
+      </div>
+      <div class="mockup-content">
+        <div class="hero-pre">Now Available &mdash; Sunshine Platform v2</div>
+        <h2>Software that<br>moves business <span style="color:var(--accent);">forward</span></h2>
+        <p class="hero-desc">We design, build, and scale enterprise applications with modern architecture and beautiful interfaces. From concept to production, faster than you thought possible.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary">Start a Project</button>
+          <button class="btn btn-secondary">See Our Work</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 9. DASHBOARD MOCKUP ===== -->
+    <div style="margin-top:4rem;">
+      <span class="section-label">09 &mdash; Aplicacao</span>
+      <h2 class="section-title">Dashboard</h2>
+      <p class="section-subtitle">Mockup de dashboard SaaS demonstrando componentes, tipografia e hierarquia visual em contexto de produto.</p>
+    </div>
+
+    <div class="mockup-dashboard" style="margin-top:2rem;">
+      <div class="mockup-browser-bar">
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-url">app.sunshine.dev/dashboard</div>
+      </div>
+      <div class="dash-layout">
+        <div class="dash-sidebar">
+          <div class="dash-sidebar-logo">
+            <svg viewBox="0 0 40 40" fill="none" width="22" height="22">
+              <circle cx="20" cy="20" r="4" fill="#FFDE59"/>
+              <g stroke="#FFDE59" stroke-width="2.5" stroke-linecap="round">
+                <line x1="20" y1="3" x2="20" y2="13"/>
+                <line x1="34.7" y1="11.5" x2="26.1" y2="17"/>
+                <line x1="34.7" y1="28.5" x2="26.1" y2="23"/>
+                <line x1="20" y1="37" x2="20" y2="27"/>
+                <line x1="5.3" y1="28.5" x2="13.9" y2="23"/>
+                <line x1="5.3" y1="11.5" x2="13.9" y2="17"/>
+              </g>
+            </svg>
+            <span>Sunshine</span>
+          </div>
+          <ul class="dash-nav">
+            <li class="active">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              Dashboard
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Projects
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              Team
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+              Analytics
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Settings
+            </li>
+          </ul>
+        </div>
+        <div class="dash-main">
+          <div class="dash-header">
+            <h3>Overview</h3>
+            <div style="display:flex;gap:0.75rem;align-items:center;">
+              <span class="badge badge-accent badge-dot">Live</span>
+              <button class="btn btn-primary" style="padding:0.5rem 1rem;font-size:0.8rem;">New Project</button>
+            </div>
+          </div>
+          <div class="dash-stats">
+            <div class="stat-card">
+              <div class="stat-label">Revenue</div>
+              <div class="stat-value">R$ 48.2k</div>
+              <div class="stat-change">+12.5% vs last month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Active Users</div>
+              <div class="stat-value">2,847</div>
+              <div class="stat-change">+8.3% vs last month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Projects</div>
+              <div class="stat-value" style="color:var(--accent);">23</div>
+              <div class="stat-change">+3 this week</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Uptime</div>
+              <div class="stat-value">99.9%</div>
+              <div class="stat-change" style="color:var(--text-tertiary);">Last 30 days</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    Sunny Systems &copy; 2026 &mdash; Proposta A: Convergence &mdash; Brand Identity V4
+  </div>
+</footer>
+
+</body>
+</html>

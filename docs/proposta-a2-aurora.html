@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sunny Systems — Proposta A2: Aurora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== TOKENS ===== */
+  :root {
+    --bg-base: #0A0B0D;
+    --bg-card: #131417;
+    --bg-elevated: #1A1B1F;
+
+    --accent: #FFDE59;
+    --accent-hover: #FFE880;
+    --accent-warm: #F5C842;
+    --accent-muted: rgba(255, 222, 89, 0.16);
+    --accent-glow: rgba(255, 222, 89, 0.25);
+    --accent-glow-strong: rgba(255, 222, 89, 0.40);
+    --accent-glow-soft: rgba(255, 222, 89, 0.08);
+
+    --text-primary: rgba(255, 255, 255, 0.87);
+    --text-secondary: rgba(255, 255, 255, 0.54);
+    --text-tertiary: rgba(255, 255, 255, 0.38);
+    --text-ghost: rgba(255, 255, 255, 0.20);
+
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.16);
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-bg-hover: rgba(255, 255, 255, 0.07);
+
+    --font-display: 'Quicksand', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    --section-pad: clamp(3rem, 8vw, 6rem);
+    --container: min(72rem, 90vw);
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 22px;
+    --radius-xl: 32px;
+  }
+
+  /* ===== RESET ===== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  img, svg { display: block; max-width: 100%; }
+  a { color: var(--accent); text-decoration: none; }
+
+  /* ===== UTILITIES ===== */
+  .container { width: var(--container); margin: 0 auto; }
+  .section { padding: var(--section-pad) 0; }
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+  .section-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 40rem;
+    line-height: 1.7;
+  }
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border-subtle);
+  }
+
+  /* ===== KEYFRAMES ===== */
+  @keyframes sunrise-glow {
+    0%, 100% {
+      opacity: 0.7;
+      transform: translate(-50%, -40%) scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: translate(-50%, -40%) scale(1.08);
+    }
+  }
+  @keyframes sunrise-rays {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+  @keyframes horizon-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes aurora-drift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes radiate-pulse {
+    0%, 100% {
+      box-shadow: 0 0 60px var(--accent-glow), 0 0 120px var(--accent-glow-soft);
+    }
+    50% {
+      box-shadow: 0 0 80px var(--accent-glow-strong), 0 0 180px rgba(255, 222, 89, 0.1), 0 0 280px rgba(255, 222, 89, 0.03);
+    }
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1rem 0;
+    background: rgba(10, 11, 13, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  nav .container { display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { display: flex; align-items: center; gap: 0.6rem; }
+  .nav-logo svg { width: 28px; height: 28px; }
+  .nav-wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+  .nav-wordmark span { font-weight: 400; color: var(--text-secondary); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    background: var(--accent-muted);
+    color: var(--accent);
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+  }
+
+  /* ===== 1. COVER ===== */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding-top: 4rem;
+  }
+  /* Radial glow behind cover — borrowed from Proposta B */
+  .cover-radial-glow {
+    position: absolute;
+    bottom: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 500px;
+    background: radial-gradient(ellipse 60% 50% at 50% 80%, var(--accent-glow-strong) 0%, rgba(255, 222, 89, 0.1) 30%, var(--accent-glow-soft) 55%, transparent 75%);
+    pointer-events: none;
+    animation: sunrise-glow 6s ease-in-out infinite;
+    border-radius: 50%;
+  }
+  /* Horizon line */
+  .cover-horizon {
+    position: absolute;
+    bottom: 28%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 5%, rgba(255, 222, 89, 0.25) 30%, rgba(255, 222, 89, 0.5) 50%, rgba(255, 222, 89, 0.25) 70%, transparent 95%);
+    pointer-events: none;
+  }
+  .cover-horizon::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-glow-soft), rgba(255,222,89,0.15), var(--accent-glow-soft), transparent);
+    background-size: 200% 100%;
+    animation: horizon-shimmer 4s linear infinite;
+  }
+  .cover-content { position: relative; z-index: 1; }
+  .cover-symbol {
+    width: 140px;
+    height: 90px;
+    margin: 0 auto 2.5rem;
+    animation: float-slow 5s ease-in-out infinite;
+    filter: drop-shadow(0 0 24px var(--accent-glow)) drop-shadow(0 8px 32px rgba(255,222,89,0.12));
+  }
+  .cover h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 0.3rem;
+  }
+  .cover h1 .systems {
+    font-weight: 400;
+    color: var(--text-secondary);
+    font-size: 0.5em;
+    display: block;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+  }
+  .cover-tagline {
+    font-size: 1.15rem;
+    color: var(--text-tertiary);
+    margin-top: 1.5rem;
+    font-weight: 400;
+    font-style: italic;
+  }
+  .cover-proposal {
+    display: inline-block;
+    margin-top: 2.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 0.5rem 1.5rem;
+    border: 1px solid var(--accent-muted);
+    border-radius: 999px;
+    background: rgba(255, 222, 89, 0.04);
+  }
+  .cover-scroll {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--text-ghost);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .cover-scroll::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(to bottom, var(--text-ghost), transparent);
+    margin: 0.5rem auto 0;
+  }
+
+  /* ===== 2. LOGO SYSTEM ===== */
+  .logo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .logo-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    transition: border-color 0.3s, background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .logo-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    height: 120px;
+    background: radial-gradient(ellipse at 50% 100%, rgba(255, 222, 89, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .logo-card:hover::before { opacity: 1; }
+  .logo-card:hover { border-color: var(--border-hover); background: var(--glass-bg-hover); }
+  .logo-card.light { background: #F5F5F3; border-color: transparent; }
+  .logo-card.light::before { display: none; }
+  .logo-card-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    text-align: center;
+    margin-top: 0.75rem;
+  }
+  .logo-card.light .logo-card-label { color: rgba(0,0,0,0.35); }
+
+  /* ===== 3. CONCEPT ===== */
+  .concept-visual {
+    margin-top: 3rem;
+    position: relative;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    min-height: 420px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .concept-glow {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse 70% 55% at 50% 100%, var(--accent-glow-strong) 0%, rgba(255,222,89,0.08) 40%, transparent 70%);
+    pointer-events: none;
+  }
+  .concept-horizon-line {
+    position: absolute;
+    bottom: 38%;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 10%, rgba(255,222,89,0.3) 35%, rgba(255,222,89,0.5) 50%, rgba(255,222,89,0.3) 65%, transparent 90%);
+  }
+  .concept-text {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 36rem;
+    padding: 3rem 2rem;
+  }
+  .concept-text h3 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  .concept-text h3 .glow-word {
+    color: var(--accent);
+    text-shadow: 0 0 40px var(--accent-glow);
+  }
+  .concept-text p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .pillar-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    transition: transform 0.3s, border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .pillar-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .pillar-card:hover { transform: translateY(-4px); border-color: rgba(255,222,89,0.15); }
+  .pillar-card:hover::after { opacity: 1; }
+  .pillar-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--accent-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    color: var(--accent);
+  }
+  .pillar-card h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+  }
+  .pillar-card p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ===== 4. PALETTE ===== */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+  .color-chip {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    transition: transform 0.2s;
+  }
+  .color-chip:hover { transform: scale(1.02); }
+  .color-chip-swatch { height: 100px; }
+  .color-chip-info { padding: 0.75rem 1rem; background: var(--bg-card); }
+  .color-chip-name { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.2rem; }
+  .color-chip-value { font-size: 0.7rem; color: var(--text-tertiary); }
+
+  /* ===== 5. TYPOGRAPHY ===== */
+  .type-scale { margin-top: 3rem; display: flex; flex-direction: column; gap: 1.5rem; }
+  .type-row {
+    display: flex;
+    align-items: baseline;
+    gap: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .type-meta {
+    flex-shrink: 0;
+    width: 120px;
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+  .type-sample { font-family: var(--font-display); line-height: 1.15; }
+  .type-sample.body-font { font-family: var(--font-body); }
+  @media (max-width: 600px) {
+    .type-row { flex-direction: column; gap: 0.5rem; }
+    .type-meta { width: auto; }
+  }
+
+  /* ===== 6. GLOW & ATMOSPHERE ===== */
+  .atmosphere-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .atmo-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    position: relative;
+    min-height: 220px;
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
+  }
+  .atmo-card-sunrise {
+    background: var(--bg-card);
+  }
+  .atmo-card-sunrise::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 300px; height: 200px;
+    background: radial-gradient(ellipse 70% 60% at 50% 100%, var(--accent-glow-strong) 0%, rgba(255,222,89,0.06) 50%, transparent 75%);
+    pointer-events: none;
+  }
+  .atmo-card-aurora {
+    background: var(--bg-card);
+  }
+  .atmo-card-aurora::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(255,222,89,0.08) 0%, transparent 40%, rgba(255,222,89,0.05) 70%, transparent 100%);
+    background-size: 200% 200%;
+    animation: aurora-drift 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .atmo-card-glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  .atmo-label { position: relative; z-index: 1; }
+  .atmo-label h4 { font-family: var(--font-display); font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+  .atmo-label p { font-size: 0.75rem; color: var(--text-tertiary); }
+
+  .glass-showcase {
+    margin-top: 2rem;
+    position: relative;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    min-height: 360px;
+    background: linear-gradient(170deg, #0e0f14 0%, #0c0e18 40%, #0f0d12 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+  .glass-showcase .orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .glass-showcase .orb-1 {
+    width: 350px; height: 200px;
+    bottom: -15%; left: 30%;
+    background: radial-gradient(ellipse at 50% 100%, rgba(255,222,89,0.22) 0%, transparent 65%);
+    filter: blur(30px);
+  }
+  .glass-showcase .orb-2 {
+    width: 180px; height: 180px;
+    top: 10%; right: 15%;
+    background: radial-gradient(circle, rgba(160,120,255,0.08) 0%, transparent 70%);
+    filter: blur(30px);
+  }
+  .glass-card-demo {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    max-width: 380px;
+    width: 100%;
+  }
+  .glass-card-demo h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
+  .glass-card-demo p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; }
+  .glass-card-demo .glass-tag {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    background: var(--accent-muted);
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+  }
+
+  /* Opacity demo */
+  .opacity-demo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .opacity-swatch {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    text-align: center;
+  }
+  .opacity-swatch .big-text {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+  .opacity-swatch .label {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    letter-spacing: 0.04em;
+  }
+
+  /* ===== 7. COMPONENTS ===== */
+  .components-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .comp-group h3 {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    color: var(--text-secondary);
+  }
+  .comp-group .items { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-start; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.6rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .btn-primary { background: var(--accent); color: #0A0B0D; }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    box-shadow: 0 0 24px var(--accent-glow), 0 0 48px rgba(255,222,89,0.1);
+  }
+  .btn-glow {
+    background: var(--accent);
+    color: #0A0B0D;
+    font-weight: 600;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .btn-glow:hover {
+    box-shadow: 0 0 32px var(--accent-glow-strong), 0 0 64px rgba(255,222,89,0.12);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-hover);
+  }
+  .btn-secondary:hover { background: var(--glass-bg); border-color: var(--text-tertiary); }
+  .btn-ghost { background: transparent; color: var(--accent); padding: 0.7rem 1rem; }
+  .btn-ghost:hover { background: var(--accent-muted); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    border-radius: 999px;
+    letter-spacing: 0.03em;
+  }
+  .badge-accent { background: var(--accent-muted); color: var(--accent); }
+  .badge-glow { background: var(--accent-muted); color: var(--accent); box-shadow: 0 0 12px rgba(255,222,89,0.12); }
+  .badge-neutral { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+  .badge-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .comp-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    transition: border-color 0.25s, transform 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .comp-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,222,89,0.3), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .comp-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+  .comp-card:hover::before { opacity: 1; }
+  .comp-card h4 { font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; }
+  .comp-card p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+
+  /* ===== 8. HERO MOCKUP ===== */
+  .mockup-hero {
+    margin-top: 3rem;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+  }
+  .mockup-browser-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .mockup-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+  .mockup-url {
+    flex: 1; margin-left: 0.5rem;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+  }
+  .mockup-content {
+    padding: clamp(2rem, 5vw, 5rem);
+    text-align: center;
+    position: relative;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .mockup-content .hero-glow {
+    position: absolute;
+    bottom: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 350px;
+    background: radial-gradient(ellipse 65% 55% at 50% 100%, var(--accent-glow-strong) 0%, rgba(255,222,89,0.06) 45%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .mockup-content .hero-horizon {
+    position: absolute;
+    bottom: 28%;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 5%, rgba(255,222,89,0.2) 30%, rgba(255,222,89,0.4) 50%, rgba(255,222,89,0.2) 70%, transparent 95%);
+    pointer-events: none;
+  }
+  .mockup-content .hero-pre {
+    position: relative; z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-muted);
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    margin-bottom: 2rem;
+  }
+  .mockup-content .hero-pre::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .mockup-content h2 {
+    position: relative; z-index: 1;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .mockup-content h2 .glow-text {
+    color: var(--accent);
+    text-shadow: 0 0 30px var(--accent-glow);
+  }
+  .mockup-content .hero-desc {
+    position: relative; z-index: 1;
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 34rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+  .mockup-content .hero-actions {
+    position: relative; z-index: 1;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* ===== 9. DASHBOARD ===== */
+  .mockup-dashboard {
+    margin-top: 2rem;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card);
+  }
+  .dash-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 440px;
+  }
+  @media (max-width: 768px) {
+    .dash-layout { grid-template-columns: 1fr; }
+    .dash-sidebar { display: none; }
+  }
+  .dash-sidebar { border-right: 1px solid var(--border-subtle); padding: 1.5rem; }
+  .dash-sidebar-logo { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; }
+  .dash-sidebar-logo svg { width: 24px; height: 16px; }
+  .dash-sidebar-logo span { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; }
+  .dash-nav { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; }
+  .dash-nav li {
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .dash-nav li:hover { background: var(--glass-bg); color: var(--text-primary); }
+  .dash-nav li.active { background: var(--accent-muted); color: var(--accent); }
+  .dash-main { padding: 2rem; }
+  .dash-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+  }
+  .dash-header h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; }
+  .dash-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-muted), transparent);
+  }
+  .stat-card .stat-label { font-size: 0.65rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+  .stat-card .stat-value { font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
+  .stat-card .stat-change { font-size: 0.72rem; color: #4ade80; margin-top: 0.25rem; }
+
+  .activity-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .activity-item {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+  }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .activity-dot.green { background: #4ade80; }
+  .activity-dot.gold { background: var(--accent); }
+  .activity-dot.blue { background: #60a5fa; }
+  .activity-time { margin-left: auto; font-size: 0.7rem; color: var(--text-tertiary); flex-shrink: 0; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--text-ghost);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="container">
+    <div class="nav-logo">
+      <!-- Sunrise symbol mini -->
+      <svg viewBox="0 0 40 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="0" y1="25" x2="40" y2="25" stroke="rgba(255,222,89,0.3)" stroke-width="1"/>
+        <path d="M20 25 A10 10 0 0 1 30 25" fill="none" stroke="#FFDE59" stroke-width="0"/>
+        <circle cx="20" cy="25" r="8" fill="#FFDE59" style="clip-path:inset(0 0 50% 0);"/>
+        <g stroke="#FFDE59" stroke-width="1.8" stroke-linecap="round">
+          <line x1="20" y1="5" x2="20" y2="13"/>
+          <line x1="9" y1="10" x2="13.5" y2="15.5"/>
+          <line x1="31" y1="10" x2="26.5" y2="15.5"/>
+          <line x1="4" y1="18" x2="10" y2="20"/>
+          <line x1="36" y1="18" x2="30" y2="20"/>
+        </g>
+      </svg>
+      <span class="nav-wordmark">sunny <span>systems</span></span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#logo">Logo</a></li>
+      <li><a href="#concept">Conceito</a></li>
+      <li><a href="#palette">Cores</a></li>
+      <li><a href="#typography">Tipo</a></li>
+      <li><a href="#atmosphere">Glow</a></li>
+      <li><a href="#components">UI</a></li>
+      <li><a href="#mockups">Mockups</a></li>
+    </ul>
+    <span class="nav-badge">Proposta A2</span>
+  </div>
+</nav>
+
+<!-- ===== 1. COVER ===== -->
+<section class="cover" id="cover">
+  <div class="cover-radial-glow"></div>
+  <div class="cover-horizon"></div>
+  <div class="cover-content">
+    <!-- Sunrise symbol — semicircle rising above horizon + 5 rays upward -->
+    <div class="cover-symbol">
+      <svg viewBox="0 0 140 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Horizon line -->
+        <line x1="0" y1="88" x2="140" y2="88" stroke="rgba(255,222,89,0.35)" stroke-width="1.2"/>
+        <!-- Sun semicircle — clipped to show only top half -->
+        <defs>
+          <clipPath id="sunriseClip">
+            <rect x="0" y="0" width="140" height="88"/>
+          </clipPath>
+        </defs>
+        <circle cx="70" cy="88" r="24" fill="#FFDE59" clip-path="url(#sunriseClip)"/>
+        <!-- Rays — only upward -->
+        <g stroke="#FFDE59" stroke-width="3" stroke-linecap="round" opacity="0.9">
+          <!-- Center ray -->
+          <line x1="70" y1="14" x2="70" y2="48"/>
+          <!-- Inner angled -->
+          <line x1="42" y1="28" x2="54" y2="50"/>
+          <line x1="98" y1="28" x2="86" y2="50"/>
+          <!-- Outer angled -->
+          <line x1="18" y1="52" x2="38" y2="65"/>
+          <line x1="122" y1="52" x2="102" y2="65"/>
+        </g>
+      </svg>
+    </div>
+    <h1>sunny<span class="systems">Systems</span></h1>
+    <p class="cover-tagline">&ldquo;A new dawn for technology&rdquo;</p>
+    <span class="cover-proposal">Proposta A2 &mdash; Aurora</span>
+  </div>
+  <span class="cover-scroll">Scroll</span>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 2. LOGO SYSTEM ===== -->
+<section class="section" id="logo">
+  <div class="container">
+    <span class="section-label">02 &mdash; Logo System</span>
+    <h2 class="section-title">Sistema de Logo</h2>
+    <p class="section-subtitle">Sol nascente &mdash; semicirculo dourado emergindo do horizonte com 5 raios ascendentes. Simboliza inicio, energia e visao de futuro. Wordmark arredondado em Quicksand preserva a personalidade amigavel e acessivel.</p>
+
+    <div class="logo-grid">
+      <!-- Symbol dark -->
+      <div>
+        <div class="logo-card">
+          <svg viewBox="0 0 140 90" fill="none" width="120" height="77">
+            <line x1="0" y1="88" x2="140" y2="88" stroke="rgba(255,222,89,0.35)" stroke-width="1.2"/>
+            <defs><clipPath id="s1"><rect x="0" y="0" width="140" height="88"/></clipPath></defs>
+            <circle cx="70" cy="88" r="24" fill="#FFDE59" clip-path="url(#s1)"/>
+            <g stroke="#FFDE59" stroke-width="3" stroke-linecap="round" opacity="0.9">
+              <line x1="70" y1="14" x2="70" y2="48"/>
+              <line x1="42" y1="28" x2="54" y2="50"/>
+              <line x1="98" y1="28" x2="86" y2="50"/>
+              <line x1="18" y1="52" x2="38" y2="65"/>
+              <line x1="122" y1="52" x2="102" y2="65"/>
+            </g>
+          </svg>
+        </div>
+        <p class="logo-card-label">Simbolo &mdash; Dark</p>
+      </div>
+
+      <!-- Wordmark dark -->
+      <div>
+        <div class="logo-card">
+          <div style="text-align:center">
+            <span style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:var(--text-primary);letter-spacing:-0.02em;">sunny</span>
+            <span style="font-family:var(--font-display);font-size:1rem;font-weight:400;color:var(--text-secondary);letter-spacing:0.25em;text-transform:uppercase;display:block;margin-top:0.15rem;">systems</span>
+          </div>
+        </div>
+        <p class="logo-card-label">Wordmark &mdash; Dark</p>
+      </div>
+
+      <!-- Lockup dark -->
+      <div>
+        <div class="logo-card">
+          <div style="display:flex;align-items:center;gap:1.25rem;">
+            <svg viewBox="0 0 140 90" fill="none" width="56" height="36">
+              <line x1="0" y1="88" x2="140" y2="88" stroke="rgba(255,222,89,0.35)" stroke-width="1.5"/>
+              <defs><clipPath id="s2"><rect x="0" y="0" width="140" height="88"/></clipPath></defs>
+              <circle cx="70" cy="88" r="24" fill="#FFDE59" clip-path="url(#s2)"/>
+              <g stroke="#FFDE59" stroke-width="3.5" stroke-linecap="round" opacity="0.9">
+                <line x1="70" y1="14" x2="70" y2="48"/>
+                <line x1="42" y1="28" x2="54" y2="50"/>
+                <line x1="98" y1="28" x2="86" y2="50"/>
+                <line x1="18" y1="52" x2="38" y2="65"/>
+                <line x1="122" y1="52" x2="102" y2="65"/>
+              </g>
+            </svg>
+            <div>
+              <span style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;color:var(--text-primary);letter-spacing:-0.02em;">sunny</span>
+              <span style="font-family:var(--font-display);font-size:0.7rem;font-weight:400;color:var(--text-secondary);letter-spacing:0.25em;text-transform:uppercase;display:block;margin-top:0.1rem;">systems</span>
+            </div>
+          </div>
+        </div>
+        <p class="logo-card-label">Lockup &mdash; Dark</p>
+      </div>
+
+      <!-- Symbol light -->
+      <div>
+        <div class="logo-card light">
+          <svg viewBox="0 0 140 90" fill="none" width="120" height="77">
+            <line x1="0" y1="88" x2="140" y2="88" stroke="rgba(0,0,0,0.15)" stroke-width="1.2"/>
+            <defs><clipPath id="s3"><rect x="0" y="0" width="140" height="88"/></clipPath></defs>
+            <circle cx="70" cy="88" r="24" fill="#C8A020" clip-path="url(#s3)"/>
+            <g stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" opacity="0.85">
+              <line x1="70" y1="14" x2="70" y2="48"/>
+              <line x1="42" y1="28" x2="54" y2="50"/>
+              <line x1="98" y1="28" x2="86" y2="50"/>
+              <line x1="18" y1="52" x2="38" y2="65"/>
+              <line x1="122" y1="52" x2="102" y2="65"/>
+            </g>
+          </svg>
+        </div>
+        <p class="logo-card-label">Simbolo &mdash; Light</p>
+      </div>
+
+      <!-- Wordmark light -->
+      <div>
+        <div class="logo-card light">
+          <div style="text-align:center">
+            <span style="font-family:var(--font-display);font-size:2.5rem;font-weight:700;color:#1A1A1A;letter-spacing:-0.02em;">sunny</span>
+            <span style="font-family:var(--font-display);font-size:1rem;font-weight:400;color:rgba(0,0,0,0.45);letter-spacing:0.25em;text-transform:uppercase;display:block;margin-top:0.15rem;">systems</span>
+          </div>
+        </div>
+        <p class="logo-card-label">Wordmark &mdash; Light</p>
+      </div>
+
+      <!-- Lockup light -->
+      <div>
+        <div class="logo-card light">
+          <div style="display:flex;align-items:center;gap:1.25rem;">
+            <svg viewBox="0 0 140 90" fill="none" width="56" height="36">
+              <line x1="0" y1="88" x2="140" y2="88" stroke="rgba(0,0,0,0.15)" stroke-width="1.5"/>
+              <defs><clipPath id="s4"><rect x="0" y="0" width="140" height="88"/></clipPath></defs>
+              <circle cx="70" cy="88" r="24" fill="#C8A020" clip-path="url(#s4)"/>
+              <g stroke="#1A1A1A" stroke-width="3.5" stroke-linecap="round" opacity="0.85">
+                <line x1="70" y1="14" x2="70" y2="48"/>
+                <line x1="42" y1="28" x2="54" y2="50"/>
+                <line x1="98" y1="28" x2="86" y2="50"/>
+                <line x1="18" y1="52" x2="38" y2="65"/>
+                <line x1="122" y1="52" x2="102" y2="65"/>
+              </g>
+            </svg>
+            <div>
+              <span style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;color:#1A1A1A;letter-spacing:-0.02em;">sunny</span>
+              <span style="font-family:var(--font-display);font-size:0.7rem;font-weight:400;color:rgba(0,0,0,0.45);letter-spacing:0.25em;text-transform:uppercase;display:block;margin-top:0.1rem;">systems</span>
+            </div>
+          </div>
+        </div>
+        <p class="logo-card-label">Lockup &mdash; Light</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 3. CONCEPT ===== -->
+<section class="section" id="concept">
+  <div class="container">
+    <span class="section-label">03 &mdash; Conceito</span>
+    <h2 class="section-title">Aurora</h2>
+    <p class="section-subtitle">O sol nascente como metafora da transformacao digital. Cada projeto e um novo amanhecer &mdash; luz dourada emergindo da fundacao escura, iluminando possibilidades.</p>
+
+    <div class="concept-visual">
+      <div class="concept-glow"></div>
+      <div class="concept-horizon-line"></div>
+      <div class="concept-text">
+        <h3>Every project is<br>a new <span class="glow-word">dawn</span></h3>
+        <p>O sol nasce do horizonte da tecnologia. A luz dourada nao e decoracao &mdash; e a propria energia que transforma ideias em produtos, complexidade em clareza, ambicao em resultados tangiveis.</p>
+      </div>
+    </div>
+
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h3>Technology</h3>
+        <p>Engenharia moderna, cloud-native, automacao inteligente. A fundacao sobre a qual a luz se constroi.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </div>
+        <h3>Design</h3>
+        <p>Interfaces que combinam estetica premium com usabilidade impecavel. Cada pixel tem proposito.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>
+          </svg>
+        </div>
+        <h3>Strategy</h3>
+        <p>Pensamento estrategico que transforma complexidade em clareza. Decisoes orientadas por dados.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3>People</h3>
+        <p>Talentos globais conectados por uma visao compartilhada. Colaboracao sem fronteiras.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 4. PALETTE ===== -->
+<section class="section" id="palette">
+  <div class="container">
+    <span class="section-label">04 &mdash; Paleta de Cores</span>
+    <h2 class="section-title">Color Tokens</h2>
+    <p class="section-subtitle">Fundacao near-black com amarelo dourado como protagonista. Glow radial como recurso expressivo sobre os tokens base.</p>
+
+    <div class="palette-grid">
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#0A0B0D"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Base</div><div class="color-chip-value">#0A0B0D</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#131417"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Card</div><div class="color-chip-value">#131417</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#1A1B1F"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Elevated</div><div class="color-chip-value">#1A1B1F</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#FFDE59"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Accent</div><div class="color-chip-value">#FFDE59</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#FFE880"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Accent Hover</div><div class="color-chip-value">#FFE880</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:#F5C842"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Accent Warm</div><div class="color-chip-value">#F5C842</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:rgba(255,222,89,0.16);border:1px solid rgba(255,222,89,0.22)"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Accent Muted</div><div class="color-chip-value">accent / 16%</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:rgba(255,255,255,0.87)"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Text Primary</div><div class="color-chip-value">white / 87%</div></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-chip-swatch" style="background:rgba(255,255,255,0.54)"></div>
+        <div class="color-chip-info"><div class="color-chip-name">Text Secondary</div><div class="color-chip-value">white / 54%</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 5. TYPOGRAPHY ===== -->
+<section class="section" id="typography">
+  <div class="container">
+    <span class="section-label">05 &mdash; Tipografia</span>
+    <h2 class="section-title">Type Scale</h2>
+    <p class="section-subtitle">Quicksand para headlines e display &mdash; arredondada, amigavel, com personalidade unica. Inter para corpo e UI &mdash; neutra, legivel, profissional.</p>
+
+    <div class="type-scale">
+      <div class="type-row">
+        <div class="type-meta">Display<br>Quicksand 700<br>4rem / 64px</div>
+        <div class="type-sample" style="font-size:4rem;font-weight:700;">A new dawn</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">H1<br>Quicksand 700<br>3rem / 48px</div>
+        <div class="type-sample" style="font-size:3rem;font-weight:700;">A new dawn</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">H2<br>Quicksand 700<br>2rem / 32px</div>
+        <div class="type-sample" style="font-size:2rem;font-weight:700;">A new dawn</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">H3<br>Quicksand 600<br>1.5rem / 24px</div>
+        <div class="type-sample" style="font-size:1.5rem;font-weight:600;">A new dawn</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">Body<br>Inter 400<br>1rem / 16px</div>
+        <div class="type-sample body-font" style="font-size:1rem;font-weight:400;">We craft enterprise software that scales with your ambition. Modern architecture, beautiful interfaces, measurable outcomes.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">Small<br>Inter 400<br>0.875rem / 14px</div>
+        <div class="type-sample body-font" style="font-size:0.875rem;font-weight:400;color:var(--text-secondary);">Secondary text for descriptions, captions, and supporting information.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">Caption<br>Inter 500<br>0.75rem / 12px</div>
+        <div class="type-sample body-font" style="font-size:0.75rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-tertiary);">Label &middot; Caption &middot; Overline</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 6. GLOW & ATMOSPHERE ===== -->
+<section class="section" id="atmosphere">
+  <div class="container">
+    <span class="section-label">06 &mdash; Glow &amp; Atmosfera</span>
+    <h2 class="section-title">Light System</h2>
+    <p class="section-subtitle">O glow radial simula a luz do amanhecer. Gradientes ascendentes, efeito aurora e glass profundo criam profundidade cinematica.</p>
+
+    <div class="opacity-demo">
+      <div class="opacity-swatch">
+        <div class="big-text" style="color:rgba(255,255,255,0.87);">Aa</div>
+        <div class="label">white / 87% &mdash; Primary</div>
+      </div>
+      <div class="opacity-swatch">
+        <div class="big-text" style="color:rgba(255,255,255,0.54);">Aa</div>
+        <div class="label">white / 54% &mdash; Secondary</div>
+      </div>
+      <div class="opacity-swatch">
+        <div class="big-text" style="color:rgba(255,255,255,0.38);">Aa</div>
+        <div class="label">white / 38% &mdash; Tertiary</div>
+      </div>
+      <div class="opacity-swatch">
+        <div class="big-text" style="color:rgba(255,255,255,0.20);">Aa</div>
+        <div class="label">white / 20% &mdash; Ghost</div>
+      </div>
+    </div>
+
+    <div class="atmosphere-grid" style="margin-top:2.5rem;">
+      <div class="atmo-card atmo-card-sunrise">
+        <div class="atmo-label">
+          <h4>Sunrise Glow</h4>
+          <p>Gradiente radial ascendente de accent</p>
+        </div>
+      </div>
+      <div class="atmo-card atmo-card-aurora">
+        <div class="atmo-label">
+          <h4>Aurora Drift</h4>
+          <p>Gradiente animado diagonal com accent</p>
+        </div>
+      </div>
+      <div class="atmo-card atmo-card-glass" style="background:rgba(255,255,255,0.03);">
+        <div class="atmo-label">
+          <h4>Deep Glass</h4>
+          <p>Backdrop-blur 32px + border white/8%</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-showcase">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="glass-card-demo">
+        <h3>Atmospheric Glass</h3>
+        <p>Glass-morphism sobre gradientes organicos. A luz do amanhecer interage com cada camada, criando profundidade e hierarquia visual natural.</p>
+        <span class="glass-tag">blur(32px) + white/4% + sunrise glow</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 7. COMPONENTS ===== -->
+<section class="section" id="components">
+  <div class="container">
+    <span class="section-label">07 &mdash; Componentes</span>
+    <h2 class="section-title">UI Components</h2>
+    <p class="section-subtitle">Componentes com glow integrado e bordas luminosas. Fontes arredondadas nos titulos preservam calor humano sobre a fundacao tecnica.</p>
+
+    <div class="components-grid">
+      <div class="comp-group">
+        <h3>Buttons</h3>
+        <div class="items">
+          <button class="btn btn-primary">Get Started</button>
+          <button class="btn btn-glow">Explore &rarr;</button>
+          <button class="btn btn-secondary">Learn More</button>
+          <button class="btn btn-ghost">View Docs</button>
+        </div>
+      </div>
+      <div class="comp-group">
+        <h3>Badges</h3>
+        <div class="items">
+          <span class="badge badge-glow">New</span>
+          <span class="badge badge-accent badge-dot">Enterprise</span>
+          <span class="badge badge-neutral badge-dot">Active</span>
+          <span class="badge badge-neutral">v4.0</span>
+        </div>
+      </div>
+      <div class="comp-group">
+        <h3>Cards</h3>
+        <div class="items" style="flex-direction:column;width:100%;">
+          <div class="comp-card">
+            <h4>Cloud Infrastructure</h4>
+            <p>Deploy and scale applications with enterprise-grade reliability and performance monitoring built-in.</p>
+          </div>
+          <div class="comp-card">
+            <h4>AI Integration</h4>
+            <p>Intelligent automation powered by machine learning models tailored to your business workflows.</p>
+          </div>
+        </div>
+      </div>
+      <div class="comp-group">
+        <h3>Input</h3>
+        <div class="items" style="flex-direction:column;width:100%;gap:1rem;">
+          <div>
+            <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;letter-spacing:0.02em;">Email address</label>
+            <input type="text" placeholder="you@company.com" style="width:100%;padding:0.7rem 1rem;background:var(--glass-bg);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-body);font-size:0.9rem;outline:none;transition:border-color 0.2s,box-shadow 0.2s;" onfocus="this.style.borderColor='rgba(255,222,89,0.3)';this.style.boxShadow='0 0 12px rgba(255,222,89,0.08)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)';this.style.boxShadow='none'">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== 8. HERO MOCKUP ===== -->
+<section class="section" id="mockups">
+  <div class="container">
+    <span class="section-label">08 &mdash; Aplicacao</span>
+    <h2 class="section-title">Hero Section</h2>
+    <p class="section-subtitle">Mockup de hero section com glow de amanhecer ascendente como elemento central de atmosfera e hierarquia.</p>
+
+    <div class="mockup-hero">
+      <div class="mockup-browser-bar">
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-url">sunnysystems.com.br</div>
+      </div>
+      <div class="mockup-content">
+        <div class="hero-glow"></div>
+        <div class="hero-horizon"></div>
+        <div class="hero-pre">Sunshine Platform v2 — Now Live</div>
+        <h2>Software that brings<br>a new <span class="glow-text">dawn</span> to business</h2>
+        <p class="hero-desc">We design, build, and scale enterprise applications with modern architecture and atmospheric interfaces. From concept to production, faster than you thought possible.</p>
+        <div class="hero-actions">
+          <button class="btn btn-glow">Start a Project</button>
+          <button class="btn btn-secondary">See Our Work</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 9. DASHBOARD ===== -->
+    <div style="margin-top:4rem;">
+      <span class="section-label">09 &mdash; Aplicacao</span>
+      <h2 class="section-title">Dashboard</h2>
+      <p class="section-subtitle">Mockup de dashboard SaaS com tipografia arredondada, glow system e componentes atmosfericos em contexto real.</p>
+    </div>
+
+    <div class="mockup-dashboard" style="margin-top:2rem;">
+      <div class="mockup-browser-bar">
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-url">app.sunshine.dev/dashboard</div>
+      </div>
+      <div class="dash-layout">
+        <div class="dash-sidebar">
+          <div class="dash-sidebar-logo">
+            <svg viewBox="0 0 40 26" fill="none" width="24" height="16">
+              <line x1="0" y1="25" x2="40" y2="25" stroke="rgba(255,222,89,0.3)" stroke-width="1"/>
+              <defs><clipPath id="s5"><rect x="0" y="0" width="40" height="25"/></clipPath></defs>
+              <circle cx="20" cy="25" r="8" fill="#FFDE59" clip-path="url(#s5)"/>
+              <g stroke="#FFDE59" stroke-width="1.8" stroke-linecap="round">
+                <line x1="20" y1="5" x2="20" y2="13"/>
+                <line x1="9" y1="10" x2="13.5" y2="15.5"/>
+                <line x1="31" y1="10" x2="26.5" y2="15.5"/>
+                <line x1="4" y1="18" x2="10" y2="20"/>
+                <line x1="36" y1="18" x2="30" y2="20"/>
+              </g>
+            </svg>
+            <span>Sunshine</span>
+          </div>
+          <ul class="dash-nav">
+            <li class="active">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              Dashboard
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Projects
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              Team
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+              Analytics
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Settings
+            </li>
+          </ul>
+        </div>
+        <div class="dash-main">
+          <div class="dash-header">
+            <h3>Overview</h3>
+            <div style="display:flex;gap:0.75rem;align-items:center;">
+              <span class="badge badge-glow badge-dot">Live</span>
+              <button class="btn btn-primary" style="padding:0.5rem 1rem;font-size:0.8rem;">New Project</button>
+            </div>
+          </div>
+          <div class="dash-stats">
+            <div class="stat-card">
+              <div class="stat-label">Revenue</div>
+              <div class="stat-value">R$ 48.2k</div>
+              <div class="stat-change">+12.5% vs last month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Active Users</div>
+              <div class="stat-value">2,847</div>
+              <div class="stat-change">+8.3% vs last month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Projects</div>
+              <div class="stat-value" style="color:var(--accent);">23</div>
+              <div class="stat-change">+3 this week</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Uptime</div>
+              <div class="stat-value">99.9%</div>
+              <div class="stat-change" style="color:var(--text-tertiary);">Last 30 days</div>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;">
+            <h4 style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;color:var(--text-secondary);">Recent Activity</h4>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-dot green"></div>
+                <span>Deploy <strong style="color:var(--text-primary)">sunshine-api</strong> v2.4.1 completed</span>
+                <span class="activity-time">2m ago</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot gold"></div>
+                <span>New client <strong style="color:var(--text-primary)">Acme Corp</strong> onboarded</span>
+                <span class="activity-time">15m ago</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot blue"></div>
+                <span>Sprint review scheduled for <strong style="color:var(--text-primary)">Tomorrow 2pm</strong></span>
+                <span class="activity-time">1h ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<footer>
+  <div class="container">
+    Sunny Systems &copy; 2026 &mdash; Proposta A2: Aurora &mdash; Brand Identity V4
+  </div>
+</footer>
+
+</body>
+</html>
